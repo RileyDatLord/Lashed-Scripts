@@ -1,0 +1,46 @@
+on script load:
+  set {activated::whitelist} to true
+  set {activated::whitelist::description} to "Custom whitelist script"
+  set {activated::whitelist::author} to "ReportCards"
+on script unload:
+  delete {activated::whitelist}
+  clear {activated::whitelist}
+
+command /whitelist [<text = "help">] [<offline player>]:
+  permission: *
+  trigger:
+    if arg-1 is "help":
+      send "&f/whitelist add <player>"
+      send "&f/whitelist remove <player>"
+      send "&f/whitelist list"
+    else if arg-1 is "add":
+      if arg-2 is not set:
+        send "&cInvalid player"
+      else:
+        if {wl::*} contains uuid of arg-2:
+          send "&cPlayer is already whitelisted"
+          stop
+        send "&eAdded &f%arg-2%&e to the whitelist"
+        set {uuidtoplayer::%arg-2's uuid%} to arg-2
+        add arg-2's uuid to {wl::*}
+    else if arg-1 is "remove":
+      if arg-2 is not set:
+        send "&cInvalid player"
+      else:
+        if {wl::*} does not contain uuid of arg-2:
+          send "&cPlayer is not whitelisted"
+          stop
+        send "&eRemoved&f %arg-2% &efrom the whitelist"
+        delete {uuidtoplayer::%arg-2's uuid%}
+        remove arg-2's uuid from {wl::*}
+    else if arg-1 is "list":
+      send "&eWhitelisted Players: &f%join {uuidtoplayer::*} with "", ""%"
+
+on join:
+  if {wl::*} contains player's uuid:
+    loop 150 times:
+      send "&7"
+    send "&eConnected to big boy smp"
+on connect:
+  if {wl::*} does not contain player's uuid:
+    kick player due to "&cYou are not invited to the SMP, if this is an issue contact big boy (ReportCards)"
