@@ -1,0 +1,34 @@
+on script load:
+  set {activated::core} to true
+  set {activated::core::description} to "Main handler for Lashed"
+  set {activated::core::author} to "ReportCards"
+on script unload:
+  delete {activated::core}
+  clear {activated::core}
+
+command /list <number = 1>:
+  trigger:
+    set {_pagemax} to rounded down size of {activated::*} / 5 + 1
+    set {_page} to arg-1
+    set {_page} to 1 if arg-1 < 1
+    set {_page} to {_pagemax} if arg-1 > {_pagemax}
+    send "&6&l[&eList of activated scripts &f%{_page}%/%{_pagemax}%&6&l] &8(&7To submit scripts use &f/submit&8)"
+    set {_num} to ({_page} - 1) * 5 + 1
+    loop {activated::*}:
+      add "&8&l| &e%loop-index% &6- &e%{activated::%loop-index%::description}% &6(&eCreator: &f%{activated::%loop-index%::author}%&6)" to {_activated::*}
+    loop 5 times:
+      if {_activated::%{_num}%} is set:
+        send "%{_activated::%{_num}%}%"
+        add 1 to {_num}
+      else:
+        stop loop
+
+on command:
+  if "plugins" is command:
+    cancel event
+    make player execute "/list"
+
+command /submit:
+  trigger:
+    send "&eYou can submit scripts by either going to our github or messaging @Riley#9202 on Discord!"
+    send "&6&lGITHUB: &ehttps://github.com/RileyDatLord/Lashed-Scripts"
